@@ -172,6 +172,32 @@ obs.next(Math.random());
 
 <br/>
 
+## <a name="how-to-cache"></a>Что такое Scheduler в RxJS?
+**Scheduler** управляет временем выполнения подписки и уведомлениями.  
+
+Проще говоря, это **кто и когда будет запускать Observable**.  
+
+Основные типы:
+
+- `queueScheduler` – выполняет задачи **последовательно в очереди**.  
+- `asapScheduler` – выполняет задачи **как можно скорее**, но после текущего кода.  
+- `asyncScheduler` – выполняет задачи **асинхронно через setTimeout**.  
+- `animationFrameScheduler` – выполняет задачи **в момент перерисовки экрана** (для анимаций).  
+
+**Пример:**
+
+```ts
+import { of, asyncScheduler } from 'rxjs';
+import { observeOn } from 'rxjs/operators';
+
+of(1,2,3)
+  .pipe(observeOn(asyncScheduler))
+  .subscribe(x => console.log(x));
+
+Здесь числа будут выведены асинхронно, после завершения текущего кода.
+<br/>
+
+
 ## <a name="how-to-cache"></a>Как кэшировать данные из observable?
 
 Для кэширования потока с состоянием можно использовать операторы `publishReplay()` и `refCount()`.
