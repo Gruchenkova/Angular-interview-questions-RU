@@ -875,38 +875,95 @@ result.subscribe(x => console.log(x));
 
 <br/>
 
-## <a name="some-frequently-used-RxJS-operators"></a>Какие операторы RxJS используются чаще всего?
-RxJS предоставляет богатый набор операторов, которые помогают манипулировать данными, фильтровать их и комбинировать Observable. Вот наиболее распространенные из них:
-Список ключевых операторов
-* **map:** Трансформирует значения, исходящие от источника.
-  ```ts
-  observable.pipe(map(value => value * 2));
+## <a name="some-frequently-used-RxJS-operators"></a>Часто используемые операторы RxJS
+
+RxJS предоставляет **богатый набор операторов** для трансформации, фильтрации и комбинирования потоков данных (Observable). Ниже — самые часто используемые.
+
+---
+
+### 1️⃣ map
+- Преобразует **каждое значение потока** в новое.
+- Пример: умножение числа на 2
+
+```ts
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+of(1, 2, 3)
+  .pipe(map(value => value * 2))
+  .subscribe(console.log); // 2, 4, 6
+
   ```
-* **filter:** Отфильтровывает значения, которые не соответствуют заданному условию.
+### 2️⃣ filter
+- Фильтрует значения потока, оставляя только те, что соответствуют условию.
+- Пример: оставить числа больше 10
   ```ts
- observable.pipe(filter(value => value > 10));
+ import { of } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
+of(5, 15, 25)
+  .pipe(filter(value => value > 10))
+  .subscribe(console.log); // 15, 25
+
   ```
 
-* **mergeMap:** "Сплющивает" вложенные Observable и испускает их значения (выполняет запросы параллельно).
+### 3️⃣ mergeMap
+- "Сплющивает" вложенные Observable в один поток
+- Выполняет несколько запросов параллельно
+- Полезно для параллельных HTTP-запросов
   ```ts
- observable.pipe(mergeMap(value => fetchData(value)));
+ import { of } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
+
+of(1, 2, 3)
+  .pipe(mergeMap(id => fetchData(id))) // fetchData возвращает Observable
+  .subscribe(console.log);
+
   ```
 
-* **switchMap:** Отменяет любой предыдущий внутренний Observable, когда испускается новое значение (удобно для поиска).
+### 4️⃣ switchMap
+-Отменяет предыдущий внутренний Observable, когда приходит новое значение
+- Идеально для поиска и автодополнения, чтобы не обрабатывать устаревшие запросы
+- Полезно для параллельных HTTP-запросов
   ```ts
- observable.pipe(switchMap(value => fetchData(value)));
-  ```
+fromEvent(inputElement, 'keyup')
+  .pipe(
+    map(event => event.target.value),
+    debounceTime(300),
+    distinctUntilChanged(),
+    switchMap(search => fetchData(search)) // fetchData возвращает Observable
+  )
+  .subscribe(console.log);
+	
+  
+	```
 
-* **catchError:** Перехватывает ошибки в потоке и позволяет обработать их или вернуть запасные данные (fallback), чтобы поток не прервался.
+### 5️⃣ catchError
+- Перехватывает ошибки в потоке
+- Позволяет обработать ошибку или вернуть запасное значение, чтобы поток не прерывался
+
   ```ts
- observable.pipe(catchError(err => of('Обнаружена ошибка')));
-  ```
+import { of, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
-* **debounceTime:** Вводит задержку перед испусканием значений. Чаще всего используется для обработки ввода в текстовых полях, чтобы не спамить запросами.
+throwError('Ошибка!')
+  .pipe(catchError(err => of('Fallback значение')))
+  .subscribe(console.log); // 'Fallback значение'
+	```
+
+
+### 6️⃣ debounceTime
+- Вводит задержку перед испусканием значений
+- Чаще всего используется для обработки ввода пользователя, чтобы не спамить запросами
+
   ```ts
- observable.pipe(debounceTime(300));
-  ```
+fromEvent(inputElement, 'keyup')
+  .pipe(
+    debounceTime(300) // ждём 300мс после последнего ввода
+  )
+  .subscribe(console.log);
 
+	```
 
 
 <br/>
